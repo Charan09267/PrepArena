@@ -1,5 +1,6 @@
 package net.company.evaluationservice.kafka;
 
+import org.springframework.beans.factory.annotation.Value;
 import net.company.evaluationservice.dto.AssessmentSubmittedEvent;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -19,20 +20,28 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConsumerConfig {
 
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
+
+
     @Bean
     public ConsumerFactory<String, AssessmentSubmittedEvent> consumerFactory() {
+
+
 
         JacksonJsonDeserializer<AssessmentSubmittedEvent> deserializer =
                 new JacksonJsonDeserializer<>(AssessmentSubmittedEvent.class);
 
-        deserializer.addTrustedPackages("*");
-
         Map<String, Object> props = new HashMap<>();
 
-        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         props.put(ConsumerConfig.GROUP_ID_CONFIG, "assessment-service-group");
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JacksonJsonDeserializer.class);
+        props.put(
+                "spring.json.type.mapping",
+                "assessmentSubmitted:net.company.evaluationservice.dto.AssessmentSubmittedEvent"
+        );
 
         return new DefaultKafkaConsumerFactory<>(
                 props,
