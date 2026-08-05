@@ -26,21 +26,29 @@ public class EvaluationServiceImpl implements EvaluationService {
     private final AttemptFeignClient attemptFeignClient;
 
     @Override
+    @Transactional
     public void evaluate(AssessmentSubmittedEvent event) {
 
-        // Fetch answer key from Contest Service
+        log.info("Fetching answer key for contest {}", event.getContestId());
+
         List<AnswerKeyDto> answerKey =
                 contestFeignClient.getAnswerKey(event.getContestId());
 
+        log.info("Answer key fetched. Questions={}", answerKey.size());
+
         EvaluationResult result = calculateResult(event, answerKey);
 
+        log.info("Calculated Result = {}", result);
 
         attemptFeignClient.updateEvaluation(
+                event.getParticipantId(),
                 result
         );
 
+        log.info("Attempt service updated successfully");
     }
 
+    @Transactional
     private EvaluationResult calculateResult(
             AssessmentSubmittedEvent event,
             List<AnswerKeyDto> answerKey

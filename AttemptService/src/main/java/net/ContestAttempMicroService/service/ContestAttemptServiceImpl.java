@@ -139,51 +139,27 @@ public class ContestAttemptServiceImpl implements ContestAttemptService {
     }
 
     @Override
-    public void updateEvaluation(
-            Long participantId ,EvaluationResultDto dto
-    ) {
+    @Transactional
+    public void updateEvaluation(Long participantId, EvaluationResultDto dto) {
 
-        ContestAttempt attempt =
-                contestAttemptRepository
-                        .findByParticipantId(dto.getParticipantId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException(
-                                        "Contest Attempt not found"
-                                )
-                        );
-        if (attempt.getStatus() == AttemptStatus.SUBMITTED) {
-            log.info("Evaluation already processed for participant {}",
-                    dto.getParticipantId());
+        ContestAttempt attempt = contestAttemptRepository
+                .findByParticipantId(participantId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Contest Attempt not found"));
+
+        if (attempt.getStatus() == AttemptStatus.EVALUATED) {
+            log.info("Evaluation already processed for participant {}", participantId);
             return;
         }
 
         attempt.setScore(dto.getScore());
-
-        attempt.setCorrectAnswers(
-                dto.getCorrectAnswers()
-        );
-
-        attempt.setWrongAnswers(
-                dto.getWrongAnswers()
-        );
-
-        attempt.setUnansweredQuestions(
-                dto.getUnansweredQuestions()
-        );
-
-        attempt.setTotalQuestions(
-                dto.getTotalQuestions()
-        );
-
-        attempt.setSubmittedAt(
-                dto.getSubmittedAt()
-        );
-
-        attempt.setStatus(
-                AttemptStatus.SUBMITTED
-        );
+        attempt.setCorrectAnswers(dto.getCorrectAnswers());
+        attempt.setWrongAnswers(dto.getWrongAnswers());
+        attempt.setUnansweredQuestions(dto.getUnansweredQuestions());
+        attempt.setTotalQuestions(dto.getTotalQuestions());
+        attempt.setSubmittedAt(dto.getSubmittedAt());
+        attempt.setStatus(AttemptStatus.EVALUATED);
 
         contestAttemptRepository.save(attempt);
-
     }
 }

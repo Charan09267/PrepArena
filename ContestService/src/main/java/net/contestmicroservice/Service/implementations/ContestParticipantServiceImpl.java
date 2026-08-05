@@ -35,8 +35,6 @@ public class ContestParticipantServiceImpl implements ContestParticipantService 
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Contest not found"));
 
-//        UserEntity currentUser = authenticationFacade.getCurrentUser();
-
         // Allow joining only before the contest starts
         if (contest.getStatus() != ContestStatus.UPCOMING) {
             throw new IllegalStateException(

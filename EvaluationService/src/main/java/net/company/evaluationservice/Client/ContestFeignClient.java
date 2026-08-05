@@ -12,7 +12,7 @@ import java.util.List;
 
 @FeignClient(name = "${contest.service.name}")
 public interface ContestFeignClient {
-    @GetMapping("/api/contests/{contestId}/answer-key")
+    @GetMapping("/contests/{contestId}/answer-key")
     List<AnswerKeyDto> getAnswerKey(
             @PathVariable Long contestId
     );

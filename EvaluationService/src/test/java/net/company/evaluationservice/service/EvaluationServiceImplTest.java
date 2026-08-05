@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -75,7 +76,7 @@ class EvaluationServiceImplTest {
         ArgumentCaptor<EvaluationResult> captor =
                 ArgumentCaptor.forClass(EvaluationResult.class);
 
-        verify(attemptFeignClient).updateEvaluation(captor.capture());
+        verify(attemptFeignClient).updateEvaluation(anyLong() , captor.capture());
 
         EvaluationResult result = captor.getValue();
 

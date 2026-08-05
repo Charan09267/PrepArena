@@ -25,6 +25,17 @@ public class ContestQuestionController {
                 questionService.addQuestion(contestId, request));
     }
 
+    @PostMapping("/{contestId}/questions/bulk")
+    public ResponseEntity<List<QuestionResponse>> addQuestion(
+            @PathVariable Long contestId,
+            @RequestBody List<CreateQuestionRequest> request) {
+
+        List<QuestionResponse> responses = request.stream()
+                .map( question -> questionService.addQuestion(contestId, question))
+                .toList();
+        return responses.isEmpty() ? ResponseEntity.noContent().build() : ResponseEntity.ok(responses);
+    }
+
     @GetMapping("/{contestId}/questions")
     public ResponseEntity<List<QuestionResponse>> getQuestions(
             @PathVariable Long contestId) {

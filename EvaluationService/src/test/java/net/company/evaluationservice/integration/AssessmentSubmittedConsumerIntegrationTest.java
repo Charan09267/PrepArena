@@ -156,6 +156,9 @@ class AssessmentSubmittedConsumerIntegrationTest {
 
         // Verify evaluation result update
         verify(attemptFeignClient, timeout(5000))
-                .updateEvaluation(any(EvaluationResult.class));
+                .updateEvaluation(
+                        anyLong(),
+                        any(EvaluationResult.class)
+                );
     }
 }
