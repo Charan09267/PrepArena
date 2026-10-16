@@ -1,4 +1,4 @@
-package net.UserService.Dto;
+package net.UserService.Dto.request;
 
 
 import lombok.Getter;

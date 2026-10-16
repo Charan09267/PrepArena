@@ -1,4 +1,4 @@
-package net.UserService.Dto;
+package net.UserService.Dto.response;
 
 import lombok.*;
 

@@ -1,8 +1,8 @@
 package net.UserService.Service;
 
 import lombok.RequiredArgsConstructor;
-import net.UserService.Dto.RegisterRequest;
-import net.UserService.Dto.RegisterResponse;
+import net.UserService.Dto.request.RegisterRequest;
+import net.UserService.Dto.response.RegisterResponse;
 import net.UserService.Entity.UserEntity;
 import net.UserService.Repo.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;

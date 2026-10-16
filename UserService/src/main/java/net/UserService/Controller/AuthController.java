@@ -1,10 +1,10 @@
 package net.UserService.Controller;
 
 import lombok.RequiredArgsConstructor;
-import net.UserService.Dto.LoginRequest;
-import net.UserService.Dto.LoginResponse;
-import net.UserService.Dto.RegisterRequest;
-import net.UserService.Dto.RegisterResponse;
+import net.UserService.Dto.request.LoginRequest;
+import net.UserService.Dto.response.LoginResponse;
+import net.UserService.Dto.request.RegisterRequest;
+import net.UserService.Dto.response.RegisterResponse;
 import net.UserService.Entity.UserEntity;
 import net.UserService.Repo.UserRepository;
 import net.UserService.Service.AuthService;
