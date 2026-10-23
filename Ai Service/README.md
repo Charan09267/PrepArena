@@ -170,8 +170,8 @@ ai-service/
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repository-url>
-cd <repository-directory>
+git clone <https://github.com/Charan09267/PrepArena>
+cd <Ai Service>
 ```
 
 Navigate to the AI Service module directory.
@@ -264,7 +264,3 @@ Potential improvements for future iterations include:
 This microservice is responsible for AI-driven interview question generation and interview evaluation. Interview lifecycle management, temporary interview context, and other orchestration responsibilities belong to the relevant application services where implemented.
 
 The AI Service can evolve independently as additional AI-powered capabilities are introduced into the combined EduPilot and ContestArena platform.
-
-## License
-
-Add the license applicable to this repository, if one is configured.
