@@ -1,18 +1,25 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- Inherit dependency management and build configuration from Spring Boot. -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.1.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
+
+    <!-- Maven coordinates identifying the Attempt Service module. -->
     <groupId>net.ContestMicroService</groupId>
     <artifactId>AttempService</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>AttemptService</name>
-    <description>AttemptService</description>
+    <description>Microservice responsible for managing contest attempts and submissions</description>
     <url/>
     <licenses>
         <license/>
@@ -26,15 +33,21 @@
         <tag/>
         <url/>
     </scm>
+
     <properties>
+        <!-- Java version used to compile the service. -->
         <java.version>21</java.version>
     </properties>
+
     <dependencies>
-<!--        starter dependecies-->
+
+        <!-- Provides Spring MVC and REST API development capabilities. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+
+        <!-- Enables development-time features such as automatic application restarts. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -42,71 +55,77 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Database Dependencies -->
+        <!-- Provides the MySQL JDBC driver at runtime. -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Provides JPA, Hibernate, and repository support for database operations. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
 
-
+        <!-- Enables declarative HTTP communication with other services using OpenFeign. -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
+
+        <!-- Registers the Attempt Service with Eureka for service discovery. -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
 
-<!--        flyway Dependencies-->
+        <!-- Integrates Flyway database migration support with Spring Boot. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
+
+        <!-- Adds MySQL-specific support for Flyway database migrations. -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
         </dependency>
 
-        <!-- Source: https://mvnrepository.com/artifact/org.springframework.kafka/spring-kafka -->
-<!--        kafka dependency-->
+        <!-- Supports Kafka-based messaging for asynchronous communication,
+             such as publishing contest submissions for evaluation. -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
-
-<!--        common Libraries-->
+        <!-- Reduces boilerplate code through annotations such as @Data and @RequiredArgsConstructor. -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- Provides shared classes and utilities used across the microservices. -->
         <dependency>
             <groupId>net.company</groupId>
             <artifactId>common-library</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
-<!--        tests dependencies-->
+        <!-- Provides testing support, including JUnit, Mockito, and Spring Boot test utilities. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-
-
-
     </dependencies>
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- Centralizes compatible versions of Spring Cloud dependencies. -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -114,11 +133,16 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 
     <build>
         <plugins>
+
+            <!-- Packages the application as an executable Spring Boot JAR.
+                 Excludes Lombok from the packaged application because it is
+                 needed during compilation rather than application runtime. -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -131,6 +155,8 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+            <!-- Configures Java compilation and Lombok annotation processing. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -142,6 +168,7 @@
                             <goal>compile</goal>
                         </goals>
                         <configuration>
+                            <!-- Processes Lombok annotations during main-source compilation. -->
                             <annotationProcessorPaths>
                                 <path>
                                     <groupId>org.projectlombok</groupId>
@@ -150,6 +177,7 @@
                             </annotationProcessorPaths>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>default-testCompile</id>
                         <phase>test-compile</phase>
@@ -157,6 +185,7 @@
                             <goal>testCompile</goal>
                         </goals>
                         <configuration>
+                            <!-- Enables Lombok annotation processing for test sources. -->
                             <annotationProcessorPaths>
                                 <path>
                                     <groupId>org.projectlombok</groupId>
@@ -167,6 +196,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
