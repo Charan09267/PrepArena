@@ -1,18 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+c<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <!-- Defines the Maven project model version. -->
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- Inherits dependency and plugin defaults from Spring Boot. -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.1.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
+
+    <!-- Identifies the Contest Service Maven module. -->
     <groupId>net.ContestMicroService</groupId>
     <artifactId>ContestService</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>ContestService</name>
     <description>ContestService</description>
+
+    <!-- Project metadata can be completed when publishing the project. -->
     <url/>
     <licenses>
         <license/>
@@ -26,80 +35,106 @@
         <tag/>
         <url/>
     </scm>
+
     <properties>
+        <!-- Sets the Java language and compilation version. -->
         <java.version>21</java.version>
     </properties>
+
     <dependencies>
+
+        <!-- Provides JPA and Hibernate integration for database persistence. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+
+        <!-- Integrates Flyway database migration support with Spring Boot. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-flyway</artifactId>
         </dependency>
+
+        <!-- Provides Spring MVC and HTTP endpoint support for the service. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
+
+        <!-- Adds MySQL-specific support for Flyway database migrations. -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-mysql</artifactId>
         </dependency>
 
+        <!-- Enables development-time tooling such as automatic application restarts. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+
+        <!-- Provides the JDBC driver required to connect to MySQL at runtime. -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- Provides annotations and compile-time code generation through Lombok. -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- Reuses shared classes and utilities across the microservices. -->
         <dependency>
             <groupId>net.company</groupId>
             <artifactId>common-library</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
+
+        <!-- Provides JPA-related testing support. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa-test</artifactId>
             <scope>test</scope>
         </dependency>
 
+        <!-- Provides the SLF4J logging API used by compatible logging implementations. -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>2.0.16</version>
         </dependency>
+
+        <!-- Provides testing support for Flyway database migrations. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-flyway-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Provides Spring MVC testing support for web-layer components. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
 
+        <!-- Registers the service with Eureka for service discovery. -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
+
     </dependencies>
 
-
+    <!-- Centralizes compatible Spring Cloud dependency versions. -->
     <dependencyManagement>
         <dependencies>
-
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -112,6 +147,9 @@
 
     <build>
         <plugins>
+
+            <!-- Packages the application as an executable Spring Boot artifact.
+                 Excludes Lombok from the packaged application. -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -124,10 +162,14 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+            <!-- Configures Lombok's annotation processor for main and test compilation. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <executions>
+
+                    <!-- Processes Lombok annotations in application source code. -->
                     <execution>
                         <id>default-compile</id>
                         <phase>compile</phase>
@@ -143,6 +185,8 @@
                             </annotationProcessorPaths>
                         </configuration>
                     </execution>
+
+                    <!-- Processes Lombok annotations in test source code. -->
                     <execution>
                         <id>default-testCompile</id>
                         <phase>test-compile</phase>
@@ -158,8 +202,10 @@
                             </annotationProcessorPaths>
                         </configuration>
                     </execution>
+
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
