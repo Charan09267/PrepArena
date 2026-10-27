@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.concurrent.CompletableFuture;
 
+
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -20,17 +21,36 @@ public class AssessmentEventProducer {
 
     private final KafkaTemplate<String, AssessmentSubmittedEvent> kafkaTemplate;
 
-    public CompletableFuture<SendResult<String, AssessmentSubmittedEvent>> publish(AssessmentSubmittedEvent event) {
+    /**
+     * Publishes a submitted assessment event to Kafka.
+     *
+     * The user ID is used as the message key so events associated with
+     * the same user are routed consistently to a Kafka partition.
+     *
+     * @param event the assessment submission event to publish
+     * @return a future containing the Kafka send result
+     */
+    public CompletableFuture<SendResult<String, AssessmentSubmittedEvent>> publish(
+            AssessmentSubmittedEvent event) {
 
         return kafkaTemplate.send(
                 TOPIC,
-                event.getUserId().toString(),   // Kafka Key
-                event                           // Kafka Value
+                event.getUserId().toString(), // Kafka message key
+                event                     // Kafka message value
         ).whenComplete((result, ex) -> {
             if (ex == null) {
-                log.info("Published successfully");
+                log.info(
+                        "Assessment submission event published successfully. Topic: {}, User ID: {}",
+                        TOPIC,
+                        event.getUserId()
+                );
             } else {
-                log.error("Failed", ex);
+                log.error(
+                        "Failed to publish assessment submission event. Topic: {}, User ID: {}",
+                        TOPIC,
+                        event.getUserId(),
+                        ex
+                );
             }
         });
     }

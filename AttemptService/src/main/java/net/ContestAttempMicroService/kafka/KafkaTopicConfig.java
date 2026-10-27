@@ -15,21 +15,45 @@ import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 import java.util.HashMap;
 import java.util.Map;
 
+
 @Configuration
 public class KafkaTopicConfig {
-
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
+    /**
+     * Configures the Kafka producer for assessment submission events.
+     *
+     * Uses String serialization for message keys and JSON serialization
+     * for event payloads.
+     *
+     * @return the configured producer factory
+     */
     @Bean
     public ProducerFactory<String, AssessmentSubmittedEvent> producerFactory() {
+
         Map<String, Object> config = new HashMap<>();
 
+        // Kafka broker addresses.
+        config.put(
+                ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,
+                bootstrapServers
+        );
 
-        config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JacksonJsonSerializer.class);
+        // Serialize Kafka message keys as strings.
+        config.put(
+                ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,
+                StringSerializer.class
+        );
+
+        // Serialize assessment events as JSON.
+        config.put(
+                ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,
+                JacksonJsonSerializer.class
+        );
+
+        // Map the event type identifier to the event class for JSON type handling.
         config.put(
                 "spring.json.type.mapping",
                 "assessmentSubmitted:net.ContestAttempMicroService.dto.AssessmentSubmittedEvent"
@@ -38,13 +62,29 @@ public class KafkaTopicConfig {
         return new DefaultKafkaProducerFactory<>(config);
     }
 
+    /**
+     * Creates a Kafka template for publishing assessment submission events.
+     *
+     * @param producerFactory the configured Kafka producer factory
+     * @return the Kafka template used by the event producer
+     */
     @Bean
     public KafkaTemplate<String, AssessmentSubmittedEvent> kafkaTemplate(
             ProducerFactory<String, AssessmentSubmittedEvent> producerFactory) {
+
         return new KafkaTemplate<>(producerFactory);
     }
+
+    /**
+     * Declares the Kafka topic used for assessment submission events.
+     *
+     * Creates the topic with three partitions and one replica per partition.
+     *
+     * @return the topic configuration
+     */
     @Bean
     public NewTopic assessmentSubmittedTopic() {
+
         return TopicBuilder
                 .name("assessment-submitted")
                 .partitions(3)
