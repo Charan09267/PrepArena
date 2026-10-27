@@ -13,37 +13,55 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
 @RestController
 @RequestMapping("/contests")
 @RequiredArgsConstructor
 public class ContestController {
+
     private final ContestService contestService;
 
-    //creating a contest
+    /**
+     * Creates a new contest for the specified user.
+     *
+     * @param userId  the ID of the user creating the contest
+     * @param request the contest creation details
+     * @return the created contest
+     */
     @PostMapping
     public ResponseEntity<ContestResponse> createContest(
-            @RequestHeader("X-USER-ID")  Long userId,
-             @RequestBody CreateContestRequest request) {
+            @RequestHeader("X-USER-ID") Long userId,
+            @RequestBody CreateContestRequest request) {
 
         return ResponseEntity.ok(
-                contestService.createContest( userId , request)
+                contestService.createContest(userId, request)
         );
     }
 
-    //Get the contest by id....
+    /**
+     * Retrieves a contest by its ID.
+     *
+     * @param id the ID of the contest
+     * @return the contest details, or 404 if the contest does not exist
+     */
     @GetMapping("/{id}")
     public ResponseEntity<ContestResponse> getContest(
             @PathVariable Long id) {
+
         try {
             return ResponseEntity.ok(
                     contestService.getContestById(id)
             );
-        }catch (ResourceNotFoundException ex){
+        } catch (ResourceNotFoundException ex) {
             return ResponseEntity.notFound().build();
         }
     }
 
-    //get all the available contests...
+    /**
+     * Retrieves all contests.
+     *
+     * @return the list of contests
+     */
     @GetMapping
     public ResponseEntity<List<ContestResponse>> getAllContests() {
 
@@ -52,57 +70,88 @@ public class ContestController {
         );
     }
 
-
-    //Update a contest.......
+    /**
+     * Updates an existing contest owned by the specified user.
+     *
+     * @param id      the ID of the contest to update
+     * @param request the updated contest details
+     * @param userId  the ID of the requesting user
+     * @return the updated contest
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ContestResponse> updateContest(
             @PathVariable Long id,
-             @RequestBody UpdateContestRequest request,
+            @RequestBody UpdateContestRequest request,
             @RequestHeader("X-USER-ID") Long userId) {
 
         return ResponseEntity.ok(
-                contestService.updateContest(id, request , userId)
+                contestService.updateContest(id, request, userId)
         );
     }
 
-    //Delete a contest......
+    /**
+     * Deletes a contest owned by the specified user.
+     *
+     * @param id     the ID of the contest to delete
+     * @param userId the ID of the requesting user
+     * @return an empty response with HTTP 204 status
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteContest(
             @PathVariable Long id,
             @RequestHeader("X-USER-ID") Long userId) {
 
-        contestService.deleteContest(id , userId);
+        contestService.deleteContest(id, userId);
 
         return ResponseEntity.noContent().build();
     }
 
-    //publish a contest to live......
+    /**
+     * Publishes a contest using the contest service.
+     *
+     * @param contestId the ID of the contest to publish
+     * @param userId    the ID of the requesting user
+     * @return the updated contest
+     */
     @PostMapping("/{contestId}/publish")
     public ResponseEntity<ContestResponse> publishContest(
             @PathVariable Long contestId,
-            @RequestHeader("X-USER-ID")Long userId) {
+            @RequestHeader("X-USER-ID") Long userId) {
 
         return ResponseEntity.ok(
-                contestService.publishContest(contestId , userId)
+                contestService.publishContest(contestId, userId)
         );
     }
 
-    //Cancel a contest.....
+    /**
+     * Cancels a contest using the contest service.
+     *
+     * @param contestId the ID of the contest to cancel
+     * @param userId    the ID of the requesting user
+     * @return the updated contest
+     */
     @PostMapping("/{contestId}/cancel")
     public ResponseEntity<ContestResponse> cancelContest(
-            @PathVariable Long contestId ,
-            @RequestHeader("X-USER-ID")Long userId) {
+            @PathVariable Long contestId,
+            @RequestHeader("X-USER-ID") Long userId) {
 
         return ResponseEntity.ok(
-                contestService.cancelContest(contestId ,userId )
+                contestService.cancelContest(contestId, userId)
         );
     }
 
+    /**
+     * Retrieves the answer key for a contest.
+     *
+     * @param contestId the ID of the contest
+     * @return the list of correct answers
+     */
     @GetMapping("/{contestId}/answer-key")
     public ResponseEntity<List<AnswerKeyDto>> getAnswerKey(
             @PathVariable Long contestId) {
 
-        return ResponseEntity.ok(contestService.getAnswerKey(contestId));
+        return ResponseEntity.ok(
+                contestService.getAnswerKey(contestId)
+        );
     }
-
 }
