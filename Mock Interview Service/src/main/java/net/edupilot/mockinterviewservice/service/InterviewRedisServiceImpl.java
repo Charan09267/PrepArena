@@ -14,6 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+
+/**
+ * Redis-backed implementation for managing temporary interview context.
+ *
+ * <p>Interview context contains session information and conversation history
+ * required while an interview is in progress. This data is stored temporarily
+ * and expires automatically after two hours.</p>
+ */
 @Service
 public class InterviewRedisServiceImpl implements InterviewRedisService {
 
@@ -23,10 +31,14 @@ public class InterviewRedisServiceImpl implements InterviewRedisService {
 
     public InterviewRedisServiceImpl(
             RedisTemplate<String, Object> redisTemplate) {
-
         this.redisTemplate = redisTemplate;
     }
 
+    /**
+     * Stores an interview context in Redis with a two-hour expiration.
+     *
+     * @param context temporary state and conversation history of the interview
+     */
     @Override
     public void saveContext(InterviewContext context) {
 
@@ -39,24 +51,46 @@ public class InterviewRedisServiceImpl implements InterviewRedisService {
         );
     }
 
+    /**
+     * Retrieves an interview context from Redis.
+     *
+     * <p>The stored value may already be an {@link InterviewContext} or may
+     * be represented as a map after deserialization. The latter is converted
+     * back into the application's context model.</p>
+     *
+     * @param interviewId unique identifier of the interview
+     * @return the reconstructed context, or {@code null} if no value exists
+     */
     @Override
     public InterviewContext getContext(Long interviewId) {
 
         String key = KEY_PREFIX + interviewId;
 
-        Object value =  redisTemplate
+        Object value = redisTemplate
                 .opsForValue()
                 .get(key);
 
-        if( value == null) return null;
+        // A missing key can indicate that the session expired or was deleted.
+        if (value == null) {
+            return null;
+        }
 
-        if( value instanceof InterviewContext context) return context;
+        // Use the stored object directly when Redis returns the expected type.
+        if (value instanceof InterviewContext context) {
+            return context;
+        }
 
+        // Reconstruct the context when deserialization produces a map.
         Map<String, Object> data = (Map<String, Object>) value;
 
         return mapToInterviewContext(data);
     }
 
+    /**
+     * Removes the temporary context associated with an interview.
+     *
+     * @param interviewId unique identifier of the interview
+     */
     @Override
     public void deleteContext(Long interviewId) {
 
@@ -65,6 +99,12 @@ public class InterviewRedisServiceImpl implements InterviewRedisService {
         redisTemplate.delete(key);
     }
 
+    /**
+     * Converts a deserialized map into an {@link InterviewContext}.
+     *
+     * @param data map containing the stored interview context fields
+     * @return reconstructed interview context
+     */
     private InterviewContext mapToInterviewContext(
             Map<String, Object> data) {
 
@@ -102,6 +142,7 @@ public class InterviewRedisServiceImpl implements InterviewRedisService {
 
         context.setCurrentQuestion((String) data.get("currentQuestion"));
 
+        // Restore the interview start time when the stored value is available.
         Object startedAt = data.get("startedAt");
 
         if (startedAt != null) {
@@ -110,6 +151,7 @@ public class InterviewRedisServiceImpl implements InterviewRedisService {
             );
         }
 
+        // Rebuild the conversation history from its deserialized representation.
         context.setConversationHistory(
                 mapToConversationHistory(
                         (List<Map<String, Object>>)
@@ -120,6 +162,12 @@ public class InterviewRedisServiceImpl implements InterviewRedisService {
         return context;
     }
 
+    /**
+     * Converts serialized conversation turns into domain objects.
+     *
+     * @param turns list of serialized conversation turns
+     * @return reconstructed conversation history, or an empty list if absent
+     */
     private List<ConversationTurn> mapToConversationHistory(
             List<Map<String, Object>> turns) {
 
@@ -145,6 +193,7 @@ public class InterviewRedisServiceImpl implements InterviewRedisService {
                     ((Number) turn.get("questionNumber")).intValue()
             );
 
+            // Restore the timestamp only when one was stored.
             Object timestamp = turn.get("timestamp");
 
             if (timestamp != null) {
