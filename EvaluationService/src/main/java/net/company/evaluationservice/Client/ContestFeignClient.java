@@ -12,10 +12,15 @@ import java.util.List;
 
 @FeignClient(name = "${contest.service.name}")
 public interface ContestFeignClient {
+
+    /**
+     * Retrieves the answer key for a contest.
+     *
+     * @param contestId identifier of the contest
+     * @return answer key containing the correct options for each question
+     */
     @GetMapping("/contests/{contestId}/answer-key")
     List<AnswerKeyDto> getAnswerKey(
             @PathVariable Long contestId
     );
-
-
 }

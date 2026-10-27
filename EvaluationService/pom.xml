@@ -1,92 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- Inherit dependency and plugin management from Spring Boot. -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.1.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath/>
     </parent>
+
+    <!-- Project coordinates and metadata. -->
     <groupId>net.company</groupId>
     <artifactId>EvaluationService</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>EvaluationService</name>
-    <description>EvaluationService</description>
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
+    <description>Evaluates submitted assessments and updates attempt results.</description>
+
     <properties>
+        <!-- Java version used to compile the service. -->
         <java.version>21</java.version>
+
+        <!-- Spring Cloud BOM version for compatible Cloud dependencies. -->
         <spring-cloud.version>2025.1.2</spring-cloud.version>
     </properties>
+
     <dependencies>
+
+        <!-- Kafka consumers for processing submitted assessment events. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-kafka</artifactId>
         </dependency>
+
+        <!-- Spring MVC and HTTP support for service endpoints. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
         </dependency>
+
+        <!-- Kafka Streams APIs, if stream-processing functionality is required. -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-streams</artifactId>
         </dependency>
+
+        <!-- Register this service with the Eureka service registry. -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
         </dependency>
+
+        <!-- Declarative HTTP clients for communicating with other services. -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
+        <!-- Generate boilerplate code such as constructors and loggers. -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!-- Kafka-specific testing support. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-kafka-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <!-- Spring MVC testing support. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Spring Boot Testing -->
+
+        <!-- General Spring Boot testing utilities. -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
 
-        <!-- Mockito -->
+        <!-- Mockito integration with JUnit Jupiter. -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
 
+        <!-- Utilities for testing asynchronous operations. -->
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
+
+    <!-- Import Spring Cloud's BOM to manage compatible dependency versions. -->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -101,10 +119,13 @@
 
     <build>
         <plugins>
+
+            <!-- Package and run the Spring Boot application. -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
+                    <!-- Lombok is provided during compilation, not packaged. -->
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
@@ -113,6 +134,8 @@
                     </excludes>
                 </configuration>
             </plugin>
+
+            <!-- Configure Lombok annotation processing during compilation. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -132,6 +155,7 @@
                             </annotationProcessorPaths>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>default-testCompile</id>
                         <phase>test-compile</phase>
@@ -149,6 +173,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 

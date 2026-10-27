@@ -25,35 +25,57 @@ public class EvaluationServiceImpl implements EvaluationService {
     private final ContestFeignClient contestFeignClient;
     private final AttemptFeignClient attemptFeignClient;
 
+    /**
+     * Evaluates a submitted assessment and sends the result to the Attempt Service.
+     *
+     * @param event submitted assessment details
+     */
     @Override
     @Transactional
     public void evaluate(AssessmentSubmittedEvent event) {
 
-        log.info("Fetching answer key for contest {}", event.getContestId());
+        log.info(
+                "Fetching answer key for contest {}",
+                event.getContestId()
+        );
 
+        // Retrieve the correct answers for the submitted contest.
         List<AnswerKeyDto> answerKey =
                 contestFeignClient.getAnswerKey(event.getContestId());
 
-        log.info("Answer key fetched. Questions={}", answerKey.size());
+        log.info(
+                "Answer key fetched. Questions={}",
+                answerKey.size()
+        );
 
+        // Calculate the participant's score using the submitted answers.
         EvaluationResult result = calculateResult(event, answerKey);
 
-        log.info("Calculated Result = {}", result);
+        log.info("Calculated evaluation result: {}", result);
 
+        // Send the calculated result to the Attempt Service.
         attemptFeignClient.updateEvaluation(
                 event.getParticipantId(),
                 result
         );
 
-        log.info("Attempt service updated successfully");
+        log.info("Attempt Service updated successfully");
     }
 
+    /**
+     * Calculates the score and answer statistics for a submitted assessment.
+     *
+     * @param event     submitted assessment details
+     * @param answerKey official answer key for the contest
+     * @return calculated evaluation result
+     */
     @Transactional
     private EvaluationResult calculateResult(
             AssessmentSubmittedEvent event,
             List<AnswerKeyDto> answerKey
     ) {
 
+        // Index the answer key by question ID for efficient lookups.
         Map<Long, AnswerKeyDto> answerKeyMap =
                 answerKey.stream()
                         .collect(Collectors.toMap(
@@ -68,11 +90,13 @@ public class EvaluationServiceImpl implements EvaluationService {
 
         int totalQuestions = answerKey.size();
 
+        // Compare each submitted answer with the corresponding correct answer.
         for (AnswerDto submitted : event.getAnswers()) {
 
             AnswerKeyDto key =
                     answerKeyMap.get(submitted.getQuestionId());
 
+            // Ignore answers that do not belong to this answer key.
             if (key == null) {
                 continue;
             }
@@ -81,18 +105,17 @@ public class EvaluationServiceImpl implements EvaluationService {
 
                 correct++;
 
+                // Add the question's marks when the answer is correct.
                 score = score.add(
                         BigDecimal.valueOf(key.getMarks())
                 );
 
             } else {
-
                 wrong++;
-
             }
-
         }
 
+        // Calculate unanswered questions using the submitted answer count.
         int unanswered = totalQuestions - event.getAnswers().size();
 
         return EvaluationResult.builder()
@@ -106,26 +129,32 @@ public class EvaluationServiceImpl implements EvaluationService {
                 .totalQuestions(totalQuestions)
                 .submittedAt(event.getSubmittedAt())
                 .build();
-
     }
 
-
+    /**
+     * Checks whether the selected option IDs match the correct option IDs.
+     *
+     * @param submitted participant's submitted answer
+     * @param key       official answer key for the question
+     * @return true if both option ID sets match
+     */
     private boolean isCorrect(
             AnswerDto submitted,
             AnswerKeyDto key
     ) {
 
+        // Treat a null selection as an empty list.
         List<Long> selected =
                 Optional.ofNullable(submitted.getOptionId())
                         .orElse(Collections.emptyList());
 
+        // Treat a missing correct-option list as an empty list.
         List<Long> correct =
                 Optional.ofNullable(key.getCorrectOptionIds())
                         .orElse(Collections.emptyList());
 
+        // Set comparison ignores option order and duplicate IDs.
         return new HashSet<>(selected)
                 .equals(new HashSet<>(correct));
-
     }
-
 }

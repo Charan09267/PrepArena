@@ -15,15 +15,23 @@ import org.springframework.stereotype.Service;
 public class AssessmentSubmittedConsumer {
 
     private final EvaluationService evaluationService;
+
+    /**
+     * Consumes assessment submission events from Kafka and initiates evaluation.
+     *
+     * @param event submitted assessment details
+     * @param key   Kafka message key
+     */
     @KafkaListener(
             topics = "assessment-submitted",
             groupId = "assessment-service-group"
     )
     public void consume(
-            AssessmentSubmittedEvent event ,
+            AssessmentSubmittedEvent event,
             @Header(KafkaHeaders.RECEIVED_KEY) String key
-    ){
-        log.info("=============================Received event========================: {}", event);
+    ) {
+        log.info("Received assessment submission event: {}", event);
+
         evaluationService.evaluate(event);
     }
 }
